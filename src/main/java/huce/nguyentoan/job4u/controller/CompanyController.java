@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.turkraft.springfilter.boot.Filter;
 
 import huce.nguyentoan.job4u.domain.Company;
-import huce.nguyentoan.job4u.domain.dto.ResultPaginationDTO;
+import huce.nguyentoan.job4u.domain.Response.ResultPaginationDTO;
 import huce.nguyentoan.job4u.service.CompanyService;
 import huce.nguyentoan.job4u.util.annotation.ApiMessage;
 import jakarta.validation.Valid;

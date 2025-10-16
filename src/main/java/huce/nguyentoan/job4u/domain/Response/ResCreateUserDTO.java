@@ -1,4 +1,4 @@
-package huce.nguyentoan.job4u.domain.dto;
+package huce.nguyentoan.job4u.domain.Response;
 
 import java.time.Instant;
 
@@ -8,11 +8,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ResUpdateUserDTO {
+public class ResCreateUserDTO {
     private long id;
     private String name;
+    private String email;
     private GenderEnum gender;
     private String address;
     private int age;
-    private Instant updatedAt;
+    private Instant createdAt;
 }

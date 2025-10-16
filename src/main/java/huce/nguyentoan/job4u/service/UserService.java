@@ -10,10 +10,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import huce.nguyentoan.job4u.domain.User;
-import huce.nguyentoan.job4u.domain.dto.ResCreateUserDTO;
-import huce.nguyentoan.job4u.domain.dto.ResUpdateUserDTO;
-import huce.nguyentoan.job4u.domain.dto.ResUserDTO;
-import huce.nguyentoan.job4u.domain.dto.ResultPaginationDTO;
+import huce.nguyentoan.job4u.domain.Response.ResCreateUserDTO;
+import huce.nguyentoan.job4u.domain.Response.ResUpdateUserDTO;
+import huce.nguyentoan.job4u.domain.Response.ResUserDTO;
+import huce.nguyentoan.job4u.domain.Response.ResultPaginationDTO;
 import huce.nguyentoan.job4u.repository.UserRepository;
 
 @Service

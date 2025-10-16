@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.util.Base64;
 
-import huce.nguyentoan.job4u.domain.dto.ResLoginDTO;
+import huce.nguyentoan.job4u.domain.Response.ResLoginDTO;
 
 @Service
 public class SecurityUtil {
