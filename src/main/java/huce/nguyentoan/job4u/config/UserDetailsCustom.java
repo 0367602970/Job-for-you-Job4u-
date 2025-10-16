@@ -1,4 +1,4 @@
-package huce.nguyentoan.job4u.service;
+package huce.nguyentoan.job4u.config;
 
 import java.util.Collections;
 
@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import huce.nguyentoan.job4u.service.UserService;
 
 @Component("userDetailsService")
 public class UserDetailsCustom implements UserDetailsService{
