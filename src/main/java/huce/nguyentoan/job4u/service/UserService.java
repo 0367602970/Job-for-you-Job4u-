@@ -10,7 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import huce.nguyentoan.job4u.domain.User;
-import huce.nguyentoan.job4u.domain.dto.Meta;
 import huce.nguyentoan.job4u.domain.dto.ResCreateUserDTO;
 import huce.nguyentoan.job4u.domain.dto.ResUpdateUserDTO;
 import huce.nguyentoan.job4u.domain.dto.ResUserDTO;
@@ -49,7 +48,7 @@ public class UserService {
     public ResultPaginationDTO fetchAllUser(Specification<User> spec, Pageable pageable) {
         Page<User> pageUser = this.userRepository.findAll(spec, pageable);
         ResultPaginationDTO rs = new ResultPaginationDTO();
-        Meta mt = new Meta();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
 
         mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());

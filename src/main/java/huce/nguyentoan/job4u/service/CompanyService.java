@@ -8,7 +8,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import huce.nguyentoan.job4u.domain.Company;
-import huce.nguyentoan.job4u.domain.dto.Meta;
 import huce.nguyentoan.job4u.domain.dto.ResultPaginationDTO;
 import huce.nguyentoan.job4u.repository.CompanyRepository;
 
@@ -27,7 +26,7 @@ public class CompanyService {
     public ResultPaginationDTO handleGetCompany(Specification<Company> spec, Pageable pageable) {
         Page<Company> pageCompany = this.companyRepository.findAll(spec, pageable);
         ResultPaginationDTO rs = new ResultPaginationDTO();
-        Meta mt = new Meta();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
 
         mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());
