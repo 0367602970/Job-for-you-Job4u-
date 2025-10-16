@@ -2,7 +2,7 @@ package huce.nguyentoan.job4u.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class LoginDTO {
+public class ReqLoginDTO {
     @NotBlank(message = "Username không được để trống")
     private String username;
 

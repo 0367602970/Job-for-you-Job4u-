@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import huce.nguyentoan.job4u.domain.User;
-import huce.nguyentoan.job4u.domain.dto.LoginDTO;
+import huce.nguyentoan.job4u.domain.dto.ReqLoginDTO;
 import huce.nguyentoan.job4u.domain.dto.ResLoginDTO;
 import huce.nguyentoan.job4u.service.UserService;
 import huce.nguyentoan.job4u.util.SecurityUtil;
@@ -46,7 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody LoginDTO loginDto) {
+    public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody ReqLoginDTO loginDto) {
         // Nạp input gồm username/password vào Security
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDto.getUsername(), loginDto.getPassword());
