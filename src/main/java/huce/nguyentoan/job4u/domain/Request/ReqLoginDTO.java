@@ -1,4 +1,4 @@
-package huce.nguyentoan.job4u.domain.dto;
+package huce.nguyentoan.job4u.domain.Request;
 
 import jakarta.validation.constraints.NotBlank;
 
