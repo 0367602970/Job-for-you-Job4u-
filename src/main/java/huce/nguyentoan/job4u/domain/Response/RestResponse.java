@@ -1,4 +1,4 @@
-package huce.nguyentoan.job4u.domain;
+package huce.nguyentoan.job4u.domain.Response;
 
 public class RestResponse<T> {
     private int statusCode;

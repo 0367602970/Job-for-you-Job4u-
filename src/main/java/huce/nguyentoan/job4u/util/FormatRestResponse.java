@@ -8,7 +8,7 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import huce.nguyentoan.job4u.domain.RestResponse;
+import huce.nguyentoan.job4u.domain.Response.RestResponse;
 import huce.nguyentoan.job4u.util.annotation.ApiMessage;
 import jakarta.servlet.http.HttpServletResponse;
 
