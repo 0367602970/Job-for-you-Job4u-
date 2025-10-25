@@ -58,7 +58,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // create a token
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
         ResLoginDTO res = new ResLoginDTO();
         User currentUserDB = this.userService.handleGetUserByUsername(loginDto.getUsername());
         if (currentUserDB != null) {
@@ -88,7 +88,7 @@ public class AuthController {
     }
 
     @GetMapping("/account")
-    @ApiMessage("fecth account info")
+    @ApiMessage("Lấy thông tin tài khoản đang đăng nhập")
     public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount() {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
 
@@ -105,7 +105,7 @@ public class AuthController {
     }
 
     @GetMapping("/refresh")
-    @ApiMessage("Get user by refresh token")
+    @ApiMessage("Lấy thông tin người dùng từ refresh token")
     public ResponseEntity<ResLoginDTO> getRefreshToken(@CookieValue(name = "refresh_token", defaultValue = "abc") String refreshToken) throws IdInvalidException {
         if (refreshToken .equals("abc")) {
             throw new IdInvalidException("Refresh token không có trong cookie");
@@ -151,7 +151,7 @@ public class AuthController {
     }
     
     @PostMapping("/logout")
-    @ApiMessage("logout user")
+    @ApiMessage("Đăng xuất thành công")
     public ResponseEntity<Void> logout() throws IdInvalidException {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         if (email.equals("")) {

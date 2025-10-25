@@ -45,12 +45,14 @@ public class CompanyController {
     }
     
     @PutMapping("/companies")
+    @ApiMessage("Cập nhật thông tin công ty thành công")
     public ResponseEntity<Company> updateCompany(@Valid @RequestBody Company reqCompany) {
         Company updateCompany = this.companyService.handleUpdateCompany(reqCompany);
         return ResponseEntity.ok(updateCompany);
     }
     
     @DeleteMapping("/companies/{id}")
+    @ApiMessage("Xoá công ty thành công")
     public ResponseEntity<Void> deleteCompany(@PathVariable("id") long id) {
         this.companyService.handleDeleteCompany(id);
         return ResponseEntity.ok(null);

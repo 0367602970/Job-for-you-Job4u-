@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    @ApiMessage("Lấy user theo id thành công")
+    @ApiMessage("Lấy người dùng theo id thành công")
     public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") long id) throws IdInvalidException{
         User fetchUser = this.userService.fetchUserById(id);
         if (fetchUser == null) {
@@ -51,13 +51,13 @@ public class UserController {
     }
     
     @GetMapping("/users")
-    @ApiMessage("Lấy danh sách user thành công")
+    @ApiMessage("Lấy danh sách người dùng thành công")
     public ResponseEntity<ResultPaginationDTO> getAllUser(@Filter Specification<User> spec, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser(spec, pageable));
     }
 
     @PostMapping("/users")
-    @ApiMessage("Tạo user thành công")
+    @ApiMessage("Tạo người dùng mới thành công")
     public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User postmanUser) throws IdInvalidException{
         boolean isEmailExist = this.userService.isEmailExist(postmanUser.getEmail());
         if (isEmailExist) {
@@ -70,18 +70,18 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    @ApiMessage("Cập nhật user thành công")
+    @ApiMessage("Cập nhật thông tin người dùng thành công")
     public ResponseEntity<ResUpdateUserDTO> updateUser(@RequestBody User user) throws IdInvalidException{
         User nUser = this.userService.handleUpdateUser(user);
         if (nUser == null) {
-            throw new IdInvalidException("User với id: " + user.getId() + " không tồn tại, vui lòng kiểm tra lại");
+            throw new IdInvalidException("Người dùng với id: " + user.getId() + " không tồn tại, vui lòng kiểm tra lại");
             
         }
         return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(nUser));
     }
 
     @DeleteMapping("/users/{id}")
-    @ApiMessage("Xóa user thành công")
+    @ApiMessage("Xóa người dùng thành công")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") long id) throws IdInvalidException{
         User currentUser = this.userService.fetchUserById(id);
         if (currentUser == null) {
