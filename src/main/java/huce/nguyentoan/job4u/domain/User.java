@@ -1,7 +1,11 @@
 package huce.nguyentoan.job4u.domain;
 
 import java.time.Instant;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import huce.nguyentoan.job4u.util.SecurityUtil;
 import huce.nguyentoan.job4u.util.constant.GenderEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -39,5 +43,20 @@ public class User {
     @JoinColumn(name = "company_id")
     private Company  company;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    List<Resume> resumes;
+
+    @PrePersist
+    public void handleBeforeCreate() {
+        this.createdAt = Instant.now();
+        this.createby = SecurityUtil.getCurrentUserLogin().orElse("");
+    }
+
+    @PreUpdate
+    public void handleBeforeUpdate() {
+        this.updatedAt = Instant.now();
+        this.updateby = SecurityUtil.getCurrentUserLogin().orElse("");
+    }
 
 }

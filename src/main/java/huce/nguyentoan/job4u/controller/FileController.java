@@ -1,5 +1,6 @@
 package huce.nguyentoan.job4u.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -7,6 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +23,8 @@ import huce.nguyentoan.job4u.domain.Response.File.ResUploadFileDTO;
 import huce.nguyentoan.job4u.service.FileService;
 import huce.nguyentoan.job4u.util.annotation.ApiMessage;
 import huce.nguyentoan.job4u.util.error.StorageException;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @RequestMapping("/api/v1")
@@ -53,4 +60,26 @@ public class FileController {
         ResUploadFileDTO res = new ResUploadFileDTO(uploadFile, Instant.now());
         return ResponseEntity.ok().body(res);
     }
+
+    @GetMapping("files")
+    @ApiMessage("Tải xuống file")
+    public ResponseEntity<Resource> downloadFile(@RequestParam(name = "fileName", required = false) String fileName, @RequestParam(name = "folder", required = false) String folder) throws StorageException, URISyntaxException, FileNotFoundException{
+        if (fileName == null || folder == null) {
+            throw new StorageException("Thiếu tham số fileName hoặc folder");
+        }
+
+        long fileLength = this.fileService.getFileLength(fileName, folder);
+        if (fileLength == 0) {
+            throw new StorageException("File with name " + fileName + " not found");
+        }
+
+        InputStreamResource resource = this.fileService.getResource(fileName, folder);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentLength(fileLength)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+    
 }
