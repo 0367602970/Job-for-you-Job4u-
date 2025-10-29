@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import huce.nguyentoan.job4u.domain.Company;
+import huce.nguyentoan.job4u.domain.Role;
 import huce.nguyentoan.job4u.domain.User;
 import huce.nguyentoan.job4u.domain.Response.ResCreateUserDTO;
 import huce.nguyentoan.job4u.domain.Response.ResUpdateUserDTO;
@@ -22,10 +23,12 @@ import huce.nguyentoan.job4u.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
     private final CompanyRepository companyService;
+    private final RoleService roleService;
 
-    public UserService(UserRepository userRepository, CompanyRepository companyService) {
+    public UserService(UserRepository userRepository, CompanyRepository companyService, RoleService roleService) {
         this.userRepository = userRepository;
         this.companyService = companyService;
+        this.roleService = roleService;
     }
 
     public User fetchUserById(long id) {
@@ -39,11 +42,18 @@ public class UserService {
     public ResUserDTO convertToResUserDTO(User user) {
         ResUserDTO resUser = new ResUserDTO();
         ResUserDTO.CompanyUser companyUser = new ResUserDTO.CompanyUser();
+        ResUserDTO.RoleUser roleUser = new ResUserDTO.RoleUser();
 
         if (user.getCompany() != null) {
             companyUser.setId(user.getCompany().getId());
             companyUser.setName(user.getCompany().getName());
             resUser.setCompany(companyUser);
+        }
+
+        if (user.getRole() != null) {
+            roleUser.setId(user.getRole().getId());
+            roleUser.setName(user.getRole().getName());
+            resUser.setRole(roleUser);
         }
 
         resUser.setId(user.getId());
@@ -73,28 +83,25 @@ public class UserService {
 
         //remove sensitive data
         List<ResUserDTO> listUser = pageUser.getContent()
-                .stream().map(item -> new ResUserDTO(
-                    item.getId(),
-                    item.getName(),
-                    item.getEmail(),
-                    item.getGender(),
-                    item.getAddress(),
-                    item.getAge(),
-                    item.getCreatedAt(),
-                    item.getUpdatedAt(),
-                    new ResUserDTO.CompanyUser(
-                        item.getCompany() != null ? item.getCompany().getId() : 0,
-                        item.getCompany() != null ? item.getCompany().getName() : null)))
+                .stream().map(item -> this.convertToResUserDTO(item))
                 .collect(Collectors.toList());
         rs.setResult(listUser);
         return rs;
     }
 
     public User handleCreateUser(User user){
+        //check company
         if (user.getCompany() != null) {
             Optional<Company> companyOptional = this.companyService.findById(user.getCompany().getId());
             user.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
         }
+
+        //check role
+        if (user.getRole() != null) {
+            Role r = this.roleService.fetchById(user.getRole().getId());
+            user.setRole(r != null ? r : null);
+        }
+
         return this.userRepository.save(user);
     }
 
@@ -130,9 +137,16 @@ public class UserService {
             currentUser.setName(reqUser.getName());
             currentUser.setAge(reqUser.getAge());
 
+            //check company
             if (reqUser.getCompany() != null) {
                 Optional<Company> companyOptional = this.companyService.findById(reqUser.getCompany().getId());
-                reqUser.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+                currentUser.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+            }
+
+            //check role
+            if (reqUser.getRole() != null) {
+                Role r = this.roleService.fetchById(reqUser.getRole().getId());
+                currentUser.setRole(r != null ? r : null);
             }
 
             currentUser = this.userRepository.save(currentUser);
