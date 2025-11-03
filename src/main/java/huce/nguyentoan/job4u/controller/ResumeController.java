@@ -91,4 +91,12 @@ public class ResumeController {
         return ResponseEntity.ok().body(this.resumeService.getAllResume(spec, pageable));
     }
     
+    @PostMapping("/resumes/by-user")
+    @ApiMessage("Lấy danh sách CV bởi người dùng")
+    public ResponseEntity<ResultPaginationDTO> fetchResumeByUser(Pageable pageable) {
+        //TODO: process POST request
+        
+        return ResponseEntity.ok().body(this.resumeService.fetchResumeByUser(pageable));
+    }
+    
 }

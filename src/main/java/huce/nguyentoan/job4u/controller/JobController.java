@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -68,7 +67,7 @@ public class JobController {
 
     @GetMapping("/jobs/{id}")
     @ApiMessage("Lấy một việc làm")
-    public ResponseEntity<Job> getJobById(@RequestParam("id") long id) throws IdInvalidException {
+    public ResponseEntity<Job> getJobById(@PathVariable("id") long id) throws IdInvalidException {
         Optional<Job> currentJob = this.jobService.handleFindById(id);
         if (!currentJob.isPresent()) {
             throw new IdInvalidException("Việc làm không tồn tại");

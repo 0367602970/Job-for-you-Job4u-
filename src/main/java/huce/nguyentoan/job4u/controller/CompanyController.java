@@ -1,5 +1,6 @@
 package huce.nguyentoan.job4u.controller;
 
+import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/v1")
 public class CompanyController {
@@ -35,6 +38,15 @@ public class CompanyController {
     public ResponseEntity<Company> createCompany(@Valid @RequestBody Company reqCompany) {
         Company company = this.companyService.handleCreateCompany(reqCompany);
         return ResponseEntity.status(HttpStatus.CREATED).body(company);
+    }
+
+    @GetMapping("/companies/{id}")
+    @ApiMessage("Lấy công ty theo id")
+    public ResponseEntity<Company> getCompany(@PathVariable("id") long id) throws IdInvalidException {
+        if (this.companyService.findCompany(id) == null) {
+            throw new IdInvalidException("Công ty không tồn tại");
+        }
+        return ResponseEntity.ok().body(this.companyService.findCompany(id));
     }
 
     @GetMapping("/companies")

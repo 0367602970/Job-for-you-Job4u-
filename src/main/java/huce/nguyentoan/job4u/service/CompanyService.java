@@ -28,6 +28,14 @@ public class CompanyService {
         return this.companyRepository.save(company);
     }
 
+    public Company findCompany(long id) {
+        Optional<Company> companyOptional = this.companyRepository.findById(id);
+        if (companyOptional.isPresent()) {
+            return companyOptional.get();
+        }
+        return null;
+    }
+
     public ResultPaginationDTO handleGetCompany(Specification<Company> spec, Pageable pageable) {
         Page<Company> pageCompany = this.companyRepository.findAll(spec, pageable);
         ResultPaginationDTO rs = new ResultPaginationDTO();

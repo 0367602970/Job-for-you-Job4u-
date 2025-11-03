@@ -2,12 +2,14 @@ package huce.nguyentoan.job4u.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import huce.nguyentoan.job4u.domain.User;
 import huce.nguyentoan.job4u.domain.Request.ReqLoginDTO;
+import huce.nguyentoan.job4u.domain.Response.ResCreateUserDTO;
 import huce.nguyentoan.job4u.domain.Response.ResLoginDTO;
 import huce.nguyentoan.job4u.service.UserService;
 import huce.nguyentoan.job4u.util.SecurityUtil;
@@ -34,15 +37,17 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${nguyentoan.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
     public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil,
-            UserService userService) {
+            UserService userService, PasswordEncoder passwordEncoder) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
@@ -63,11 +68,11 @@ public class AuthController {
         User currentUserDB = this.userService.handleGetUserByUsername(loginDto.getUsername());
         if (currentUserDB != null) {
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDB.getId(), currentUserDB.getEmail(),
-                    currentUserDB.getName());
+                    currentUserDB.getName(), currentUserDB.getRole());
             res.setUser(userLogin);
         }
 
-        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res.getUser());
+        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res);
         res.setAccessToken(access_token);
 
         //Create refresh token
@@ -99,6 +104,7 @@ public class AuthController {
             userLogin.setId(currentUserDB.getId());
             userLogin.setEmail(currentUserDB.getEmail());
             userLogin.setName(currentUserDB.getName());
+            userLogin.setRole(currentUserDB.getRole());
             userGetAccount.setUser(userLogin);
         }
         return ResponseEntity.ok().body(userGetAccount);
@@ -126,11 +132,11 @@ public class AuthController {
         User currentUserDB = this.userService.handleGetUserByUsername(email);
         if (currentUserDB != null) {
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDB.getId(), currentUserDB.getEmail(),
-                    currentUserDB.getName());
+                    currentUserDB.getName(), currentUserDB.getRole());
             res.setUser(userLogin);
         }
 
-        String access_token = this.securityUtil.createAccessToken(email, res.getUser());
+        String access_token = this.securityUtil.createAccessToken(email, res);
         res.setAccessToken(access_token);
 
         //Create refresh token
@@ -172,4 +178,16 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, deleteSpringCookie.toString()).body(null);
     }
     
+    @PostMapping("/register")
+    @ApiMessage("Đăng ký tài khoản thành công")
+    public ResponseEntity<ResCreateUserDTO> register(@Valid @RequestBody User postmanUser) throws IdInvalidException{
+        boolean isEmailExist = this.userService.isEmailExist(postmanUser.getEmail());
+        if (isEmailExist) {
+            throw new IdInvalidException("Email đã tồn tại, vui lòng sử dụng email khác");
+        }
+        String hashPassword = this.passwordEncoder.encode(postmanUser.getPassword());
+        postmanUser.setPassword(hashPassword);
+        User nUser = this.userService.handleCreateUser(postmanUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(nUser));
+    }
 }

@@ -77,5 +77,15 @@ public class PermissionService {
 
         this.permissionRepository.delete(currentPermission);
     }
+
+    public boolean isSameName(Permission permission) {
+        Permission permissionDB = this.fetchById(permission.getId());
+        if (permissionDB != null) {
+            if (permissionDB.getName().equals(permission.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 

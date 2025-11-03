@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 
-
 @RestController
 @RequestMapping("/api/v1")
 public class PermissionController {
@@ -55,9 +54,13 @@ public class PermissionController {
         }
         
         //check exist by module, apiPath, method
-        if (this.permissionService.isPermissionExist(permission)) {
-            throw new IdInvalidException("Quyền hạn đã tồn tại");
-        }
+        // if (this.permissionService.isPermissionExist(permission)) {
+        //     throw new IdInvalidException("Quyền hạn đã tồn tại");
+        //     //check name
+        //     if (this.permissionService.isSameName(permission)) {
+                
+        //     }
+        // }
         return ResponseEntity.ok().body(this.permissionService.updatePermission(permission));
     }
 

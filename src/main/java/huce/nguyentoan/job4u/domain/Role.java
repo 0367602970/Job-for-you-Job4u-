@@ -1,6 +1,6 @@
 package huce.nguyentoan.job4u.domain;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,8 +37,8 @@ public class Role {
 
     private String description;
     private boolean active;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String createdBy;
     private String updatedBy;
 
@@ -53,13 +53,13 @@ public class Role {
 
     @PrePersist
     public void handleBeforeCreate() {
-        this.createdAt = Instant.now();
+        this.createdAt = LocalDateTime.now();
         this.createdBy = SecurityUtil.getCurrentUserLogin().orElse("");
     }
 
     @PreUpdate
     public void handleBeforeUpdate() {
-        this.updatedAt = Instant.now();
+        this.updatedAt = LocalDateTime.now();
         this.updatedBy = SecurityUtil.getCurrentUserLogin().orElse("");
     }
 }
