@@ -53,7 +53,7 @@ public class RoleController {
             throw new IdInvalidException("Vai trò không tồn tại");
         }
         
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.roleService.updateRole(role));
+        return ResponseEntity.ok().body(this.roleService.updateRole(role));
     }
 
     @DeleteMapping("/roles/{id}")
