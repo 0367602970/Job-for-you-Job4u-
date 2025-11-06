@@ -2,8 +2,10 @@ package huce.nguyentoan.job4u;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
+@EnableAsync
 public class Job4uApplication {
 
 	public static void main(String[] args) {
