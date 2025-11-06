@@ -96,4 +96,13 @@ public class SubscriberService {
         }
     }
 
+    //Đặt lịch tự động
+    // @Scheduled(cron = "*/10 * * * * *")
+    // public void testCron() {
+    //     System.out.println(">>> TEST CRON");
+    // }
+
+    public Subscriber findByEmail(String email) {
+        return this.subscriberRepository.findByEmail(email);
+    }
 }

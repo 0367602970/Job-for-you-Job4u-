@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import huce.nguyentoan.job4u.domain.Subscriber;
 import huce.nguyentoan.job4u.service.SubscriberService;
+import huce.nguyentoan.job4u.util.SecurityUtil;
 import huce.nguyentoan.job4u.util.annotation.ApiMessage;
 import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import jakarta.validation.Valid;
@@ -48,4 +49,13 @@ public class SubscriberController {
         
         return ResponseEntity.ok().body(this.subscriberService.updateSubscriber(subDB, subsRequest));
     }
+
+    @PostMapping("/subsribers/skills")
+    @ApiMessage("Lấy kỹ năng đã đăng ký")
+    public ResponseEntity<Subscriber> getSubscribersSkill() throws IdInvalidException{
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() == true ? SecurityUtil.getCurrentUserLogin().get() : "";
+        
+        return ResponseEntity.ok().body(this.subscriberService.findByEmail(email));
+    }
+    
 }
