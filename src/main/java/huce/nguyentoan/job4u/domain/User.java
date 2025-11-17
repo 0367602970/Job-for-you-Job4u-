@@ -8,11 +8,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import huce.nguyentoan.job4u.util.SecurityUtil;
 import huce.nguyentoan.job4u.util.constant.GenderEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @Getter
 @Setter
 public class User {
@@ -20,8 +22,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank(message = "Hãy nhập tên của bạn")
     private String name;
+
+    @Email
+    @NotBlank(message = "Email không được để trống")
     private String email;
+
+    @NotBlank(message = "Mật khẩu không được để trống")
     private String password;
 
     private int age;
@@ -33,7 +41,7 @@ public class User {
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
-    
+
     private Instant createdAt;
     private Instant updatedAt;
     private String createby;
@@ -41,7 +49,7 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "company_id")
-    private Company  company;
+    private Company company;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore

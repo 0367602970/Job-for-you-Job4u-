@@ -1,5 +1,7 @@
 package huce.nguyentoan.job4u.controller;
 
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,8 +22,8 @@ public class EmailController {
 
     @GetMapping("/email")
     @ApiMessage("Gửi email")
-    // @Scheduled(cron = "*/30 * * * * *")
-    // @Transactional
+//  @Scheduled(cron = "*/86400 * * * * *")
+//  @Transactional
     public String sendSimpleEmail() {
         // this.emailService.sendSimpleEmail();
         // this.emailService.sendEmailSync("toandeptrai3108@gmail.com", "send email from Job4U", "<h1> <b> hello </b> </h1>", false, true);
