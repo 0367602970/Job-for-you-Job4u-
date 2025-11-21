@@ -112,4 +112,8 @@ public class JobService {
 
         return result;
     }
+
+    public List<Job> getJobByCompany(long companyId) {
+        return this.jobRepository.findByCompanyId(companyId);
+    }
 }

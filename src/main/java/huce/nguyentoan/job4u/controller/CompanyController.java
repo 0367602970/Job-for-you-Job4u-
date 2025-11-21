@@ -1,5 +1,7 @@
 package huce.nguyentoan.job4u.controller;
 
+import huce.nguyentoan.job4u.domain.Job;
+import huce.nguyentoan.job4u.service.JobService;
 import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,13 +25,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 public class CompanyController {
     private final CompanyService companyService;
+    private final JobService jobService;
 
-    public CompanyController(CompanyService companyService) {
+    public CompanyController(CompanyService companyService,  JobService jobService) {
         this.companyService = companyService;
+        this.jobService = jobService;
     }
     
     @PostMapping("/companies")
@@ -66,5 +72,11 @@ public class CompanyController {
     public ResponseEntity<Void> deleteCompany(@PathVariable("id") long id) {
         this.companyService.handleDeleteCompany(id);
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/companies/{id}/jobs")
+    @ApiMessage("Lấy việc làm theo công ty")
+    public ResponseEntity<List<Job>> getJobsOfCompany(@PathVariable("id") long id) {
+        return ResponseEntity.ok().body(this.jobService.getJobByCompany(id));
     }
 }

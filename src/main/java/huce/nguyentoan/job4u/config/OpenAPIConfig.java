@@ -33,7 +33,7 @@ public class OpenAPIConfig {
         return new Contact()
                 .email("nguyentoan3108hg@gmail.com")
                 .name("NDT")
-                .url("https://hoidanit.vn");
+                .url("https://facebook.com");
     }
 
     private License createLicense() {
@@ -47,8 +47,7 @@ public class OpenAPIConfig {
                 .title("Job for you (Job4U) API")
                 .version("1.0")
                 .contact(createContact())
-                .description("This API exposes all endpoints (job hunter)")
-                .termsOfService("https://hoidanit.vn/donate")
+                .description("This API exposes all endpoints (job for you)")
                 .license(createLicense());
     }
 
@@ -58,7 +57,7 @@ public class OpenAPIConfig {
                 .info(createApiInfo())
                 .servers(List.of(
                         createServer("http://localhost:8080", "Server URL in Development environment"),
-                        createServer("https://hoidanit.vn", "Server URL in Production environment")))
+                        createServer("https://facebook.com", "Server URL in Production environment")))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()));
     }

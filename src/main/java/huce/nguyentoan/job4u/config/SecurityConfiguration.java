@@ -3,9 +3,13 @@ package huce.nguyentoan.job4u.config;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import huce.nguyentoan.job4u.service.CustomOAuth2UserService;
+import huce.nguyentoan.job4u.service.OAuth2SuccessHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -31,6 +35,13 @@ import huce.nguyentoan.job4u.util.SecurityUtil;
 public class SecurityConfiguration {
     @Value("${nguyentoan.jwt.base64-secret}")
     private String jwtKey;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+
+    @Autowired
+    @Lazy
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -60,6 +71,10 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/v1/jobs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/skills/**").permitAll()
                         .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth -> oauth
+                    .userInfoEndpoint(user -> user.userService(customOAuth2UserService))
+                    .successHandler(oAuth2SuccessHandler)
             )
             .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
             .authenticationEntryPoint(customAuthenticationEntryPoint)
