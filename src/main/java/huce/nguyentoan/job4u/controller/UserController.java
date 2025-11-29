@@ -90,5 +90,12 @@ public class UserController {
         this.userService.handleDeleteUser(id);
         return ResponseEntity.ok(null);
     }
-    
+
+    @GetMapping("/users/count-user")
+    @ApiMessage("Đếm số user")
+    public ResponseEntity<Long> countNormalUser() {
+        return ResponseEntity.ok(this.userService.countNormalUser());
+    }
+
+
 }

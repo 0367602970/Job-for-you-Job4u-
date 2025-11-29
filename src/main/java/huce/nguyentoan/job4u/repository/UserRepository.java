@@ -2,6 +2,7 @@ package huce.nguyentoan.job4u.repository;
 
 import java.util.List;
 
+import huce.nguyentoan.job4u.domain.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     User findByRefreshTokenAndEmail(String token, String email);
 
     List<User> findByCompany(Company company);
+
+    long countByRoleIsNull();
+
 }

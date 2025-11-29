@@ -22,12 +22,9 @@ public class EmailController {
 
     @GetMapping("/email")
     @ApiMessage("Gửi email")
-//  @Scheduled(cron = "*/86400 * * * * *")
-//  @Transactional
+//    @Scheduled(cron = "*/60 * * * * *")
+//    @Transactional
     public String sendSimpleEmail() {
-        // this.emailService.sendSimpleEmail();
-        // this.emailService.sendEmailSync("toandeptrai3108@gmail.com", "send email from Job4U", "<h1> <b> hello </b> </h1>", false, true);
-        // this.emailService.sendEmailFromTemplateSync("toandeptrai3108@gmail.com", "Send email from Job4U", "job");
         System.out.println(">>> Gui Mail");
         this.subscriberService.sendSubscribersEmailJobs();
         return "Đã gửi mail";

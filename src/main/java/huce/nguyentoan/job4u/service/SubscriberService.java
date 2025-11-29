@@ -1,5 +1,8 @@
 package huce.nguyentoan.job4u.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,25 +76,35 @@ public class SubscriberService {
 
 
     public void sendSubscribersEmailJobs() {
+
+        Instant oneWeekAgo = Instant.now().minus(7, ChronoUnit.DAYS);
+
         List<Subscriber> listSubs = this.subscriberRepository.findAll();
-        if (listSubs != null && listSubs.size() > 0) {
-            for (Subscriber sub : listSubs) {
-                List<Skill> listSkills = sub.getSkills();
-                if (listSkills != null && listSkills.size() > 0) {
-                    List<Job> listJobs = this.jobRepository.findBySkillsIn(listSkills);
-                    if (listJobs != null && listJobs.size() > 0) {
+        if (listSubs == null || listSubs.isEmpty()) return;
 
-                        List<ResEmailJob> arr = listJobs.stream().map(
-                        job -> this.convertJobToSendEmail(job)).collect(Collectors.toList());
+        for (Subscriber sub : listSubs) {
+            List<Skill> listSkills = sub.getSkills();
+            if (listSkills == null || listSkills.isEmpty()) continue;
 
-                        this.emailService.sendEmailFromTemplateSync(
-                                sub.getEmail(),
-                                "Cơ hội việc làm hot đang chờ đón bạn, khám phá ngay",
-                                "job",
-                                sub.getName(),
-                                arr);
-                    }
-                }
+            // Lấy job mới
+            List<Job> listJobs = this.jobRepository.findNewJobsBySkills(listSkills, oneWeekAgo);
+
+            if (listJobs != null && !listJobs.isEmpty()) {
+
+                List<ResEmailJob> arr = listJobs.stream()
+                        .sorted(Comparator.comparing(Job::getCreatedAt).reversed())
+                        .limit(5)
+                        .map(job -> convertJobToSendEmail(job))
+                        .collect(Collectors.toList());
+
+
+                this.emailService.sendEmailFromTemplateSync(
+                        sub.getEmail(),
+                        "Cơ hội việc làm HOT mới cập nhật dành cho bạn",
+                        "job",
+                        sub.getName(),
+                        arr
+                );
             }
         }
     }

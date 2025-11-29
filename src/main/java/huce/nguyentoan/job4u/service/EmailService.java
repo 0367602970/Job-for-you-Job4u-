@@ -2,6 +2,9 @@ package huce.nguyentoan.job4u.service;
 
 import java.nio.charset.StandardCharsets;
 
+import huce.nguyentoan.job4u.domain.Job;
+import huce.nguyentoan.job4u.domain.User;
+import huce.nguyentoan.job4u.util.SecurityUtil;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -55,6 +58,16 @@ public class EmailService {
         context.setVariable("name", username);
         context.setVariable("jobs", value);
         
+        String content = this.templateEngine.process(templateName, context);
+        this.sendEmailSync(to, subject, content, false, true);
+    }
+
+    @Async
+    public void sendEmail(String to, String subject, String templateName, String username, String jobName) {
+        Context context = new Context();
+        context.setVariable("name", username);
+        context.setVariable("jobName", jobName);
+
         String content = this.templateEngine.process(templateName, context);
         this.sendEmailSync(to, subject, content, false, true);
     }

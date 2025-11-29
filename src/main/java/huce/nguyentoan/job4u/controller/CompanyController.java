@@ -1,7 +1,10 @@
 package huce.nguyentoan.job4u.controller;
 
 import huce.nguyentoan.job4u.domain.Job;
+import huce.nguyentoan.job4u.domain.User;
 import huce.nguyentoan.job4u.service.JobService;
+import huce.nguyentoan.job4u.service.UserService;
+import huce.nguyentoan.job4u.util.SecurityUtil;
 import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,10 +35,12 @@ import java.util.List;
 public class CompanyController {
     private final CompanyService companyService;
     private final JobService jobService;
+    private final UserService userService;
 
-    public CompanyController(CompanyService companyService,  JobService jobService) {
+    public CompanyController(CompanyService companyService,  JobService jobService,  UserService userService) {
         this.companyService = companyService;
         this.jobService = jobService;
+        this.userService = userService;
     }
     
     @PostMapping("/companies")
@@ -78,5 +83,52 @@ public class CompanyController {
     @ApiMessage("Lấy việc làm theo công ty")
     public ResponseEntity<List<Job>> getJobsOfCompany(@PathVariable("id") long id) {
         return ResponseEntity.ok().body(this.jobService.getJobByCompany(id));
+    }
+
+    // --------------Chức năng của HR--------------
+    @GetMapping("/companies/by-hr")
+    @ApiMessage("Lấy thông tin công ty của HR")
+    public ResponseEntity<Company> getCompanyByHR() throws IdInvalidException{
+
+        long companyId = this.jobService.findCompanyByUser();
+        if (companyId == 0) {
+            throw new IdInvalidException("Bạn không thuộc công ty nào");
+        }
+        Company com = this.companyService.findCompany(companyId);
+        return ResponseEntity.ok().body(com);
+    }
+
+    @PutMapping("/companies/by-hr")
+    @ApiMessage("Cập nhật thông tin công ty thành công")
+    public ResponseEntity<Company> updateCompanyByHR(@Valid @RequestBody Company reqCompany) throws IdInvalidException {
+        String email = SecurityUtil.getCurrentUserLogin().orElse("");
+        if (email.isEmpty()) {
+            throw new IdInvalidException("Không tìm thấy người dùng");
+        }
+
+        User currentUser = this.userService.handleGetUserByUsername(email);
+        if (currentUser == null) {
+            throw new IdInvalidException("Không tìm thấy người dùng");
+        }
+
+        Company company = currentUser.getCompany();
+        if (company == null) {
+            throw new IdInvalidException("Bạn không thuộc công ty nào");
+        }
+
+        reqCompany.setId(company.getId());
+
+        Company updated = this.companyService.handleUpdateCompany(reqCompany);
+        if (updated == null) {
+            throw new IdInvalidException("Cập nhật công ty thất bại");
+        }
+
+        return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping("/companies/count")
+    @ApiMessage("Đếm số lượng công ty")
+    public ResponseEntity<Long> countCompany() {
+        return ResponseEntity.ok(this.companyService.countCompany());
     }
 }

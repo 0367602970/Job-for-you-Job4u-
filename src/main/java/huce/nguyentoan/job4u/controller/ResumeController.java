@@ -38,9 +38,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
-
-
-
 @RestController
 @RequestMapping("/api/v1")
 public class ResumeController {
@@ -63,8 +60,10 @@ public class ResumeController {
         if(!isIdExist){
             throw new IdInvalidException("User id/Job id không tồn tại");
         }
+        ResCreateResumeDTO res = this.resumeService.createResume(resume);
+        this.resumeService.sendEmailAfterApply(resume);
         
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.resumeService.createResume(resume));
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
     
     @PutMapping("/resumes")
@@ -104,20 +103,39 @@ public class ResumeController {
     @GetMapping("/resumes")
     public ResponseEntity<ResultPaginationDTO> fetchAllResume(@Filter Specification<Resume> spec, Pageable pageable) {
         List<Long> arrJobIds = null;
-        String email = SecurityUtil.getCurrentUserLogin().isPresent() == true ? SecurityUtil.getCurrentUserLogin().get() : "";
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         User currentUser = this.userService.handleGetUserByUsername(email);
+        Specification<Resume> finalSpec = spec;
+
         if (currentUser != null) {
-            Company userCompany = currentUser.getCompany();
-            if (userCompany != null) {
-                List<Job> companyJobs = userCompany.getJobs();
-                if (companyJobs != null && companyJobs.size() > 0) {
-                    arrJobIds = companyJobs.stream().map(x -> x.getId()).collect(Collectors.toList());
+
+            // Nếu là ADMIN -> không filter job theo công ty
+            if ("SUPER_ADMIN".equals(currentUser.getRole().getName())) {
+            }
+
+            // Nếu là HR -> filter theo company_id
+            else if ("HR".equals(currentUser.getRole().getName())) {
+
+                Company userCompany = currentUser.getCompany();
+                if (userCompany != null) {
+                    List<Job> companyJobs = userCompany.getJobs();
+
+                    if (companyJobs != null && !companyJobs.isEmpty()) {
+                        arrJobIds = companyJobs.stream()
+                                .map(Job::getId)
+                                .collect(Collectors.toList());
+
+                        Specification<Resume> jobInspec = filterSpecificationConverter.convert(
+                                filterBuilder.field("job").in(
+                                        filterBuilder.input(arrJobIds)
+                                ).get()
+                        );
+
+                        finalSpec = jobInspec.and(spec);
+                    }
                 }
             }
         }
-
-        Specification<Resume> jobInspec = filterSpecificationConverter.convert(filterBuilder.field("job").in(filterBuilder.input(arrJobIds)).get());
-        Specification<Resume> finalSpec = jobInspec.and(spec);
 
         return ResponseEntity.ok().body(this.resumeService.getAllResume(finalSpec, pageable));
     }
@@ -125,7 +143,6 @@ public class ResumeController {
     @PostMapping("/resumes/by-user")
     @ApiMessage("Lấy danh sách CV bởi người dùng")
     public ResponseEntity<ResultPaginationDTO> fetchResumeByUser(Pageable pageable) {
-        //TODO: process POST request
         
         return ResponseEntity.ok().body(this.resumeService.fetchResumeByUser(pageable));
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,11 +43,16 @@ public class ResumeService {
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
+    private final UserService userService;
+    private final EmailService emailService;
 
-    public ResumeService(ResumeRepository resumeRepository, UserRepository userRepository, JobRepository jobRepository) {
+    public ResumeService(ResumeRepository resumeRepository, UserRepository userRepository,
+                         JobRepository jobRepository, UserService userService, EmailService emailService) {
         this.resumeRepository = resumeRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
+        this.userService = userService;
+        this.emailService = emailService;
     }
 
     public boolean checkResumeExistByUserAndJob(Resume resume) {
@@ -153,5 +159,21 @@ public class ResumeService {
         List<ResFetchResumeDTO> listResume = pageResume.getContent().stream().map(item -> this.getResume(item)).collect(Collectors.toList());
         rs.setResult(listResume);
         return rs;
+    }
+
+    public void sendEmailAfterApply(Resume resume) throws IdInvalidException{
+        String email = resume.getEmail();
+        User user = this.userService.handleGetUserByUsername(email);
+        Optional<Job> job = this.jobRepository.findById(resume.getJob().getId());
+        if (job.isEmpty()) {
+            throw new IdInvalidException("Không tìm thấy việc làm");
+        }
+        this.emailService.sendEmail(
+                email,
+                "[JOB FOR YOU] THƯ CẢM ƠN ỨNG TUYỂN",
+                "test",
+                user.getName(),
+                job.get().getName());
+
     }
 }

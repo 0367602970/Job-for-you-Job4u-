@@ -1,7 +1,9 @@
 package huce.nguyentoan.job4u.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import huce.nguyentoan.job4u.domain.User;
+import huce.nguyentoan.job4u.service.UserService;
+import huce.nguyentoan.job4u.util.SecurityUtil;
+import org.springframework.web.bind.annotation.*;
 
 import com.turkraft.springfilter.boot.Filter;
 
@@ -14,18 +16,13 @@ import huce.nguyentoan.job4u.util.annotation.ApiMessage;
 import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import jakarta.validation.Valid;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
@@ -79,5 +76,24 @@ public class JobController {
         return ResponseEntity.ok().body(this.jobService.fecthAll(spec, pageable));
 
     }
-    
+
+    @GetMapping("/jobs/{id}/related")
+    @ApiMessage("Lấy công việc tương tự")
+    public ResponseEntity<List<Job>> fetchRelatedJobs(@PathVariable long id) {
+        List<Job> relatedJobs = this.jobService.getRelatedJobs(id);
+        return ResponseEntity.ok().body(relatedJobs);
+    }
+
+    @GetMapping("/jobs/by-company")
+    @ApiMessage("Lấy công việc của 1 công ty")
+    public ResponseEntity<List<Job>> fetchJobsByCompanyId() throws IdInvalidException {
+        long companyId = this.jobService.findCompanyByUser();
+        return ResponseEntity.ok().body(this.jobService.findJobByCompany(companyId));
+    }
+
+    @GetMapping("/jobs/count")
+    @ApiMessage("Đếm số lượng việc làm")
+    public ResponseEntity<Long> getJobsCount() {
+        return ResponseEntity.ok(this.jobService.countJob());
+    }
 }

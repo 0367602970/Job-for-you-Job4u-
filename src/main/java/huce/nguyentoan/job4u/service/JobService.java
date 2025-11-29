@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import huce.nguyentoan.job4u.domain.User;
+import huce.nguyentoan.job4u.util.SecurityUtil;
+import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,10 +24,12 @@ import huce.nguyentoan.job4u.repository.SkillRepository;
 public class JobService {
     private final JobRepository jobRepository;
     private final SkillRepository skillRepository;
+    private final UserService userService;
 
-    public JobService(JobRepository jobRepository, SkillRepository skillRepository) {
+    public JobService(JobRepository jobRepository, SkillRepository skillRepository, UserService userService) {
         this.jobRepository = jobRepository;
         this.skillRepository = skillRepository;
+        this.userService = userService;
     }
 
     public ResCreateJobDTO createJob(Job j) {
@@ -115,5 +120,44 @@ public class JobService {
 
     public List<Job> getJobByCompany(long companyId) {
         return this.jobRepository.findByCompanyId(companyId);
+    }
+
+    public List<Job> getRelatedJobs(long jobId) {
+        Job job = this.jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Không tìm thấy công việc"));
+
+        List<Long> skillId = job.getSkills()
+                .stream()
+                .map(Skill::getId)
+                .toList();
+
+        if (skillId.isEmpty()) {
+            return List.of();
+        }
+
+        return this.jobRepository.findRelatedJobs(jobId, skillId);
+    }
+
+    public long findCompanyByUser() throws IdInvalidException{
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
+        if (email.isEmpty()) {
+            throw new IdInvalidException("Không tìm thấy người dùng");
+        }
+        User currentUser = this.userService.handleGetUserByUsername(email);
+        if (currentUser == null) {
+            throw new IdInvalidException("Không tìm thấy người dùng");
+        }
+        long companyId = currentUser.getCompany().getId();
+        if (companyId == 0) {
+            throw new IdInvalidException("Bạn không thuộc công ty nào");
+        }
+        return companyId;
+    }
+
+    public List<Job> findJobByCompany(long companyId) {
+        return this.jobRepository.findByCompanyId(companyId);
+    }
+
+    public long countJob() {
+        return this.jobRepository.count();
     }
 }

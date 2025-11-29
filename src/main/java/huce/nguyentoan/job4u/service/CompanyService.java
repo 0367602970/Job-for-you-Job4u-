@@ -74,4 +74,8 @@ public class CompanyService {
         }
         this.companyRepository.deleteById(id);
     }
+
+    public long countCompany() {
+        return this.companyRepository.count();
+    }
 }
