@@ -8,5 +8,5 @@ import huce.nguyentoan.job4u.domain.Resume;
 
 @Repository
 public interface ResumeRepository extends JpaRepository<Resume, Long>, JpaSpecificationExecutor<Resume>{
-    
+    boolean existsByUserIdAndJobId(long userId, long jobId);
 }

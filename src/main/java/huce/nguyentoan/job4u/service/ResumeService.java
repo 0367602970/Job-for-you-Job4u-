@@ -75,6 +75,10 @@ public class ResumeService {
         return true;
     }
 
+    public boolean hasUserAppliedJob(Long userId, Long jobId) {
+        return resumeRepository.existsByUserIdAndJobId(userId, jobId);
+    }
+
     public ResCreateResumeDTO createResume(Resume resume) {
         resume = this.resumeRepository.save(resume);
 
