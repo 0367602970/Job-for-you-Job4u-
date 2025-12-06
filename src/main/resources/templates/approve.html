@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Job4U - Thông báo</title>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #f3f6fb; font-family: 'Segoe UI', Roboto, Arial, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0;">
+    <tr>
+        <td align="center">
+
+            <table width="600" cellpadding="0" cellspacing="0"
+                   style="background-color: #ffffff; border-radius: 10px;
+                              box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
+
+                <!-- Header -->
+                <tr>
+                    <td style="background-color: #1e90ff; color: #ffffff; padding: 20px 30px;">
+                        <div style="font-size: 22px; font-weight: 600;">Job4U</div>
+                        <div style="font-size: 14px;">Cơ hội nhỏ, giá trị lớn 💼</div>
+                    </td>
+                </tr>
+
+                <!-- Body -->
+                <tr>
+                    <td style="padding: 30px;">
+
+                        <p style="font-size: 16px; margin: 0 0 10px;">
+                            Xin chào <strong th:text="${name}"></strong>,
+                        </p>
+
+                        <p style="font-size: 16px; color: #333;">
+                            Cảm ơn bạn đã tin tưởng và muốn hợp tác với chúng tôi.
+                        </p>
+
+                        <p style="font-size: 16px; color: #333;">
+                            Chúc mừng! Yêu cầu trở thành nhà tuyển dụng của bạn đã được phê duyệt.
+                            Bạn hiện có thể đăng tuyển, quản lý tin tuyển dụng và sử dụng toàn bộ tính năng dành cho nhà tuyển dụng.
+                            Tài khoản và mật khẩu sẽ là tài khoản mà bạn dùng khi đăng ký.
+                        </p>
+
+                        <p style="font-size: 16px; color: #333;">
+                            Cảm ơn bạn đã lựa chọn Job4U!
+                        </p>
+
+                        <div style="margin-top: 25px; text-align: center;">
+                            <a href="" target="_blank"
+                               style="background-color: #1e90ff; color: #ffffff;
+                                          text-decoration: none; font-size: 16px;
+                                          font-weight: 500; padding: 12px 30px;
+                                          border-radius: 6px; display: inline-block;">
+                                Truy cập Job4U
+                            </a>
+                        </div>
+
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="background-color: #f9fafc; padding: 20px 30px;
+                                   color: #666; font-size: 14px;">
+                        <p style="margin: 0;">Trân trọng,</p>
+                        <p style="margin: 5px 0 0; font-weight: 500;">NDT — Job4U Team</p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

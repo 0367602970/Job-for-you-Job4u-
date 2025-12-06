@@ -105,7 +105,7 @@ public class ResumeController {
         }
         return ResponseEntity.ok().body(this.resumeService.getResume(reqResumeOptional.get()));
     }
-    
+
     @GetMapping("/resumes")
     public ResponseEntity<ResultPaginationDTO> fetchAllResume(@Filter Specification<Resume> spec, Pageable pageable) {
         List<Long> arrJobIds = null;
@@ -113,31 +113,33 @@ public class ResumeController {
         User currentUser = this.userService.handleGetUserByUsername(email);
         Specification<Resume> finalSpec = spec;
 
-        if (currentUser != null) {
+        if (currentUser != null && currentUser.getRole().getId() == 2) {
 
-            // Nếu là ADMIN -> không filter job theo công ty
-            if ("SUPER_ADMIN".equals(currentUser.getRole().getName())) {
-            }
+            Company company = currentUser.getCompany();
+            if (company != null) {
 
-            // Nếu là HR -> filter theo company_id
-            else if ("HR".equals(currentUser.getRole().getName())) {
+                List<Long> jobIds = company.getJobs()
+                        .stream()
+                        .map(Job::getId)
+                        .collect(Collectors.toList());
 
-                Company userCompany = currentUser.getCompany();
-                if (userCompany != null) {
-                    List<Job> companyJobs = userCompany.getJobs();
+                // 🔥 FIX: Nếu không có job nào → trả empty
+                if (jobIds == null || jobIds.isEmpty()) {
 
-                    if (companyJobs != null && !companyJobs.isEmpty()) {
-                        arrJobIds = companyJobs.stream()
-                                .map(Job::getId)
-                                .collect(Collectors.toList());
+                    Specification<Resume> emptySpec =
+                            (root, query, cb) -> cb.equal(root.get("id"), -1); // luôn false
 
-                        Specification<Resume> jobInspec = filterSpecificationConverter.convert(
-                                filterBuilder.field("job").in(
-                                        filterBuilder.input(arrJobIds)
-                                ).get()
-                        );
+                    finalSpec = emptySpec;
+                }
+                else {
+                    Specification<Resume> jobSpec = (root, query, cb) ->
+                            root.get("job").get("id").in(jobIds);
 
-                        finalSpec = jobInspec.and(spec);
+                    // Nếu spec null → chỉ dùng jobSpec
+                    if (spec == null) {
+                        finalSpec = jobSpec;
+                    } else {
+                        finalSpec = spec.and(jobSpec);
                     }
                 }
             }
