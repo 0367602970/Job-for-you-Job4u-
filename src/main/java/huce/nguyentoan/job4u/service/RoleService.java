@@ -47,6 +47,11 @@ public class RoleService {
         return null;
     }
 
+    public Role fetchByName(String name) {
+        Optional<Role> roleOptional = Optional.ofNullable(roleRepository.findByName(name));
+        return roleOptional.orElse(null);
+    }
+
     public Role updateRole(Role role) {
         Role roleDB = this.fetchById(role.getId());
         //check permission

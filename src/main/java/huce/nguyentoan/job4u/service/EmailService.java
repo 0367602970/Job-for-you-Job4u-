@@ -72,4 +72,13 @@ public class EmailService {
         this.sendEmailSync(to, subject, content, false, true);
     }
 
+    @Async
+    public void sendEmailRequest(String to, String subject, String templateName, String username) {
+        Context context = new Context();
+        context.setVariable("name", username);
+
+        String content = this.templateEngine.process(templateName, context);
+        this.sendEmailSync(to, subject, content, false, true);
+    }
+
 }
