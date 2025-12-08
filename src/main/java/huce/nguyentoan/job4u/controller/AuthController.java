@@ -189,6 +189,9 @@ public class AuthController {
         if (isEmailExist) {
             throw new IdInvalidException("Email đã tồn tại, vui lòng sử dụng email khác");
         }
+        if(postmanUser.getPassword() == null) {
+            throw new IdInvalidException("Mật khẩu không được để trống");
+        }
         String hashPassword = this.passwordEncoder.encode(postmanUser.getPassword());
         postmanUser.setPassword(hashPassword);
         User nUser = this.userService.handleCreateUser(postmanUser);
