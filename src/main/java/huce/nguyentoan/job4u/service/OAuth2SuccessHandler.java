@@ -9,17 +9,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final SecurityUtil securityUtil;
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -30,6 +33,18 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String email = oauthUser.getAttribute("email");
 
         User user = userService.handleGetUserByUsername(email);
+
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setName(oauthUser.getAttribute("name"));
+
+            // Tạo mật khẩu random (đã mã hoá)
+            String randomPassword = UUID.randomUUID().toString();
+            user.setPassword(passwordEncoder.encode(randomPassword));
+
+            userService.handleCreateUser(user);
+        }
 
         ResLoginDTO res = new ResLoginDTO();
         res.setUser(new ResLoginDTO.UserLogin(
