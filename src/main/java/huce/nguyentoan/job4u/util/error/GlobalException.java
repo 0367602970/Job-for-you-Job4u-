@@ -1,5 +1,6 @@
 package huce.nguyentoan.job4u.util.error;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,4 +90,14 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
     }
 
+
+    @ExceptionHandler(value = {URISyntaxException.class})
+    public ResponseEntity<RestResponse<Object>> handleURISyntax(Exception ex) {
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+        res.setError("Upload thất bại");
+        res.setMessage("Tên file phải đặt đúng định dạng (không chứa dấu cách)");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+    }
 }

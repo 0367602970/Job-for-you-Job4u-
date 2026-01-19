@@ -25,6 +25,7 @@ public class CompanyService {
     }
 
     public Company handleCreateCompany(Company company) {
+        company.setActive(true);
         return this.companyRepository.save(company);
     }
 
@@ -37,7 +38,14 @@ public class CompanyService {
     }
 
     public ResultPaginationDTO handleGetCompany(Specification<Company> spec, Pageable pageable) {
-        Page<Company> pageCompany = this.companyRepository.findAll(spec, pageable);
+        Specification<Company> finalSpec;
+        if (spec == null) {
+            finalSpec = (root, query, cb) -> cb.isTrue(root.get("active"));
+        } else {
+            finalSpec = spec.and((root, query, cb) -> cb.isTrue(root.get("active")));
+        }
+
+        Page<Company> pageCompany = this.companyRepository.findAll(finalSpec, pageable);
         ResultPaginationDTO rs = new ResultPaginationDTO();
         ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
 
@@ -55,6 +63,7 @@ public class CompanyService {
     public Company handleUpdateCompany(Company company) {
         Optional<Company> comOptional = this.companyRepository.findById(company.getId());
         if (comOptional.isPresent()) {
+            System.out.println(">>>" + company.isActive());
             Company currentCompany = comOptional.get();
             currentCompany.setLogo(company.getLogo());
             currentCompany.setName(company.getName());
@@ -69,10 +78,9 @@ public class CompanyService {
         Optional<Company> companyOptional = this.companyRepository.findById(id);
         if (companyOptional.isPresent()) {
             Company company = companyOptional.get();
-            List<User> users = this.userRepository.findByCompany(company);
-            this.userRepository.deleteAll(users);
+            company.setActive(false);
+            this.companyRepository.save(company);
         }
-        this.companyRepository.deleteById(id);
     }
 
     public long countCompany() {

@@ -30,6 +30,8 @@ public class Company {
 
     private String logo;
 
+    private boolean active;
+
     private Instant createdAt;
 
     private Instant updatedAt;
