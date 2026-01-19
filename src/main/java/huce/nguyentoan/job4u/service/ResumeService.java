@@ -1,9 +1,11 @@
 package huce.nguyentoan.job4u.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import huce.nguyentoan.job4u.util.constant.ResumeStateEnum;
 import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -95,11 +97,33 @@ public class ResumeService {
     }
 
     public ResUpdateResumeDTO updateResume(Resume resume) {
-        resume = this.resumeRepository.save(resume);
+        Resume existing = resumeRepository.findById(resume.getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ"));
+        System.out.println(">>>>" + existing.getStatus());
+        if (existing.getStatus() == ResumeStateEnum.APPROVED ||
+                existing.getStatus() == ResumeStateEnum.REJECTED) {
+
+            throw new RuntimeException("Hồ sơ đã APPROVE hoặc REJECT, không thể cập nhật thêm.");
+        }
+
+        existing.setStatus(resume.getStatus());
+        resumeRepository.save(existing);
+
+//        long jobId = existing.getJob().getId();
+//        int approveResumes = resumeRepository.countByJobIdAndStatus(jobId, ResumeStateEnum.APPROVED);
+//
+//        Job job = jobRepository.findById(jobId)
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy việc làm"));
+//
+//        if (approveResumes >= job.getQuantity()) {
+//            job.setActive(false);
+//            jobRepository.save(job);
+//        }
 
         ResUpdateResumeDTO resUpdateResumeDTO = new ResUpdateResumeDTO();
-        resUpdateResumeDTO.setUpdatedAt(resume.getUpdatedAt());
-        resUpdateResumeDTO.setUpdatedBy(resume.getUpdatedBy());
+        resUpdateResumeDTO.setUpdatedAt(existing.getUpdatedAt());
+        resUpdateResumeDTO.setUpdatedBy(existing.getUpdatedBy());
+        resUpdateResumeDTO.setStatus(existing.getStatus());
 
         return resUpdateResumeDTO;
     }

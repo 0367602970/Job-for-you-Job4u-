@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import huce.nguyentoan.job4u.domain.Resume;
 import huce.nguyentoan.job4u.domain.User;
+import huce.nguyentoan.job4u.repository.ResumeRepository;
 import huce.nguyentoan.job4u.util.SecurityUtil;
 import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import org.springframework.data.domain.Page;
@@ -25,11 +27,14 @@ public class JobService {
     private final JobRepository jobRepository;
     private final SkillRepository skillRepository;
     private final UserService userService;
+    private final ResumeRepository resumeRepository;
 
-    public JobService(JobRepository jobRepository, SkillRepository skillRepository, UserService userService) {
+    public JobService(JobRepository jobRepository, SkillRepository skillRepository,
+                      UserService userService, ResumeRepository resumeRepository) {
         this.jobRepository = jobRepository;
         this.skillRepository = skillRepository;
         this.userService = userService;
+        this.resumeRepository = resumeRepository;
     }
 
     public ResCreateJobDTO createJob(Job j) {
@@ -97,11 +102,25 @@ public class JobService {
     }
 
     public void deleteJob(long id) {
+        Optional<Job> jobOpt = this.jobRepository.findById(id);
+        if (jobOpt.isPresent()) {
+            Job job = jobOpt.get();
+            List<Resume> resumes = this.resumeRepository.findByJob(job);
+            this.resumeRepository.deleteAll(resumes);
+        }
         this.jobRepository.deleteById(id);
     }
 
     public ResultPaginationDTO fecthAll(Specification<Job> spec, Pageable pageable) {
-        Page<Job> pageJobs = this.jobRepository.findAll(spec, pageable);
+        Specification<Job> finalSpec;
+
+        if (spec == null) {
+            finalSpec = (root, query, cb) -> cb.isTrue(root.get("active"));
+        } else {
+            finalSpec = spec.and((root, query, cb) -> cb.isTrue(root.get("active")));
+        }
+
+        Page<Job> pageJobs = this.jobRepository.findAll(finalSpec, pageable);
 
         ResultPaginationDTO result = new ResultPaginationDTO();
         ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
@@ -119,7 +138,7 @@ public class JobService {
     }
 
     public List<Job> getJobByCompany(long companyId) {
-        return this.jobRepository.findByCompanyId(companyId);
+        return this.jobRepository.findByCompanyIdAndActiveTrue(companyId);
     }
 
     public List<Job> getRelatedJobs(long jobId) {

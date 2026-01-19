@@ -78,11 +78,8 @@ public class ResumeController {
         if (reqResumeOptional.isEmpty()) {
             throw new IdInvalidException("Hồ sơ với id " + resume.getId() + " không tồn tại");
         }
-
-        Resume reqResume = reqResumeOptional.get();
-        reqResume.setStatus(resume.getStatus());
         
-        return ResponseEntity.ok().body(this.resumeService.updateResume(reqResume));
+        return ResponseEntity.ok().body(this.resumeService.updateResume(resume));
     }
 
     @DeleteMapping("/resumes/{id}")

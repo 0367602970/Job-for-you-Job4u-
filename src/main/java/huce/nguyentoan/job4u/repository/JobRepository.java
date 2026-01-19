@@ -23,18 +23,20 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
 
     @Query("""
         SELECT j FROM Job j JOIN j.skills s
-        WHERE s IN :skills
+        WHERE s IN :skills AND j.active = true
         AND (j.createdAt >= :cutoff OR j.updatedAt >= :cutoff)
         """)
     List<Job> findNewJobsBySkills(@Param("skills") List<Skill> skills,
                                   @Param("cutoff") Instant cutoff);
 
+    List<Job> findByCompanyIdAndActiveTrue(long companyId);
     List<Job> findByCompanyId(long companyId);
 
     @Query("""
             SELECT j FROM Job j
             JOIN j.skills s
             WHERE s.id IN :skillId AND j.id <> :currentJobId
+            AND j.active = true
             GROUP BY j.id
             ORDER BY COUNT(s.id) DESC
             """)

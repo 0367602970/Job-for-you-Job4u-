@@ -1,5 +1,6 @@
 package huce.nguyentoan.job4u.controller;
 
+import huce.nguyentoan.job4u.domain.Response.RestResponse;
 import huce.nguyentoan.job4u.domain.User;
 import huce.nguyentoan.job4u.service.UserService;
 import huce.nguyentoan.job4u.util.SecurityUtil;
@@ -50,14 +51,19 @@ public class JobController {
     }
 
     @DeleteMapping("/jobs/{id}")
-    @ApiMessage("Xoá một việc làm")
-    public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
+    @ApiMessage("Xoá việc làm thành công")
+    public ResponseEntity<RestResponse<String>> delete(@PathVariable("id") long id) throws IdInvalidException {
         Optional<Job> currentJob = this.jobService.handleFindById(id);
-        if (!currentJob.isPresent()) {
+        if (currentJob.isEmpty()) {
             throw new IdInvalidException("Việc làm không tồn tại");
         }
         this.jobService.deleteJob(id);
-        return ResponseEntity.noContent().build();
+
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Xóa việc làm thành công");
+        response.setData(null);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/jobs/{id}")
