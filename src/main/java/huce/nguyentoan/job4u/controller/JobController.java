@@ -2,8 +2,18 @@ package huce.nguyentoan.job4u.controller;
 
 import huce.nguyentoan.job4u.domain.Response.RestResponse;
 import huce.nguyentoan.job4u.domain.User;
+import huce.nguyentoan.job4u.dto.CustomerDto;
+import huce.nguyentoan.job4u.dto.ExportColumn;
 import huce.nguyentoan.job4u.service.UserService;
+import huce.nguyentoan.job4u.util.CsvUtils;
+import huce.nguyentoan.job4u.util.ExcelUtils;
+import huce.nguyentoan.job4u.util.ExportFormater;
 import huce.nguyentoan.job4u.util.SecurityUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import com.turkraft.springfilter.boot.Filter;
@@ -17,6 +27,7 @@ import huce.nguyentoan.job4u.util.annotation.ApiMessage;
 import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import jakarta.validation.Valid;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,13 +37,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 
+
 @RestController
 @RequestMapping("api/v1")
 public class JobController {
     private final JobService jobService;
+    private final ExcelUtils excelUtils;
+    private final CsvUtils csvUtils;
 
-    public JobController(JobService jobService) {
+    public JobController(JobService jobService, ExcelUtils excelUtils, CsvUtils csvUtils) {
         this.jobService = jobService;
+        this.excelUtils = excelUtils;
+        this.csvUtils = csvUtils;
     }
 
     @PostMapping("/jobs")
@@ -75,7 +91,7 @@ public class JobController {
         }
         return ResponseEntity.ok().body(currentJob.get());
     }
-    
+
     @GetMapping("/jobs")
     @ApiMessage("Lấy danh sách việc làm")
     public ResponseEntity<ResultPaginationDTO> getAllJobs(@Filter Specification<Job> spec, Pageable pageable) {
@@ -101,5 +117,132 @@ public class JobController {
     @ApiMessage("Đếm số lượng việc làm")
     public ResponseEntity<Long> getJobsCount() {
         return ResponseEntity.ok(this.jobService.countJob());
+    }
+
+    @GetMapping("/jobs/export")
+    public void exportJob(
+            @Filter Specification<Job> spec,
+            Pageable pageable,
+            HttpServletResponse response
+    ) throws IOException {
+
+
+        ResultPaginationDTO result =
+                jobService.fecthAll(
+                        spec,
+                        pageable
+                );
+
+
+        List<Job> jobs =
+                (List<Job>) result.getResult();
+
+
+        List<ExportColumn<Job>> columns = List.of(
+
+                new ExportColumn<>(
+                        "Tên Job",
+                        Job::getName,
+                        ExportFormater.STRING
+                ),
+
+                new ExportColumn<>(
+                        "Địa điểm",
+                        Job::getLocation,
+                        ExportFormater.STRING
+                ),
+
+                new ExportColumn<>(
+                        "Mức lương",
+                        Job::getSalary,
+                        ExportFormater.NUMBER
+                ),
+
+                new ExportColumn<>(
+                        "Level",
+                        Job::getLevel,
+                        ExportFormater.STRING
+                )
+        );
+
+
+        byte[] file =
+                excelUtils.exportXlsx(
+                        jobs,
+                        columns
+                );
+
+
+        response.setContentType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+
+
+        response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=jobs.xlsx"
+        );
+
+
+        response.getOutputStream()
+                .write(file);
+
+
+        response.getOutputStream()
+                .flush();
+    }
+
+    @GetMapping("/jobs/export/csv")
+    public void exportCsv(
+            HttpServletResponse response
+    ) throws IOException {
+        List<ExportColumn<Job>> columns = List.of(
+
+                new ExportColumn<>(
+                        "Tên Job",
+                        Job::getName,
+                        ExportFormater.STRING
+                ),
+
+                new ExportColumn<>(
+                        "Địa điểm",
+                        Job::getLocation,
+                        ExportFormater.STRING
+                ),
+
+                new ExportColumn<>(
+                        "Mức lương",
+                        Job::getSalary,
+                        ExportFormater.NUMBER
+                ),
+
+                new ExportColumn<>(
+                        "Level",
+                        Job::getLevel,
+                        ExportFormater.STRING
+                )
+        );
+
+
+        byte[] file =
+                csvUtils.exportCsv(
+                        jobService.findAll(),
+                        columns
+                );
+
+
+        response.setContentType(
+                "text/csv; charset=UTF-8"
+        );
+
+
+        response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=jobs.csv"
+        );
+
+
+        response.getOutputStream()
+                .write(file);
     }
 }
