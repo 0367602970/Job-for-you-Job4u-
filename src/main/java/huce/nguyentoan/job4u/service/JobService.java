@@ -137,6 +137,10 @@ public class JobService {
         return result;
     }
 
+    public List<Job> findAll() {
+        return this.jobRepository.findAll();
+    }
+
     public List<Job> getJobByCompany(long companyId) {
         return this.jobRepository.findByCompanyIdAndActiveTrue(companyId);
     }
