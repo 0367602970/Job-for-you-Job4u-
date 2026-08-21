@@ -138,38 +138,10 @@ public class JobController {
                 (List<Job>) result.getResult();
 
 
-        List<ExportColumn<Job>> columns = List.of(
-
-                new ExportColumn<>(
-                        "Tên Job",
-                        Job::getName,
-                        ExportFormater.STRING
-                ),
-
-                new ExportColumn<>(
-                        "Địa điểm",
-                        Job::getLocation,
-                        ExportFormater.STRING
-                ),
-
-                new ExportColumn<>(
-                        "Mức lương",
-                        Job::getSalary,
-                        ExportFormater.NUMBER
-                ),
-
-                new ExportColumn<>(
-                        "Level",
-                        Job::getLevel,
-                        ExportFormater.STRING
-                )
-        );
-
-
         byte[] file =
                 excelUtils.exportXlsx(
                         jobs,
-                        columns
+                        jobService.getExportColumns()
                 );
 
 
@@ -196,38 +168,11 @@ public class JobController {
     public void exportCsv(
             HttpServletResponse response
     ) throws IOException {
-        List<ExportColumn<Job>> columns = List.of(
-
-                new ExportColumn<>(
-                        "Tên Job",
-                        Job::getName,
-                        ExportFormater.STRING
-                ),
-
-                new ExportColumn<>(
-                        "Địa điểm",
-                        Job::getLocation,
-                        ExportFormater.STRING
-                ),
-
-                new ExportColumn<>(
-                        "Mức lương",
-                        Job::getSalary,
-                        ExportFormater.NUMBER
-                ),
-
-                new ExportColumn<>(
-                        "Level",
-                        Job::getLevel,
-                        ExportFormater.STRING
-                )
-        );
-
 
         byte[] file =
                 csvUtils.exportCsv(
                         jobService.findAll(),
-                        columns
+                        jobService.getExportColumns()
                 );
 
 
