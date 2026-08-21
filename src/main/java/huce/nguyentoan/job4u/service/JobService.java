@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 
 import huce.nguyentoan.job4u.domain.Resume;
 import huce.nguyentoan.job4u.domain.User;
+import huce.nguyentoan.job4u.dto.ExportColumn;
 import huce.nguyentoan.job4u.repository.ResumeRepository;
+import huce.nguyentoan.job4u.util.ExportFormater;
 import huce.nguyentoan.job4u.util.SecurityUtil;
 import huce.nguyentoan.job4u.util.error.IdInvalidException;
 import org.springframework.data.domain.Page;
@@ -182,5 +184,35 @@ public class JobService {
 
     public long countJob() {
         return this.jobRepository.count();
+    }
+
+    public List<ExportColumn<Job>> getExportColumns() {
+
+        return List.of(
+
+                new ExportColumn<>(
+                        "Tên Job",
+                        Job::getName,
+                        ExportFormater.STRING
+                ),
+
+                new ExportColumn<>(
+                        "Địa điểm",
+                        Job::getLocation,
+                        ExportFormater.STRING
+                ),
+
+                new ExportColumn<>(
+                        "Mức lương",
+                        Job::getSalary,
+                        ExportFormater.NUMBER
+                ),
+
+                new ExportColumn<>(
+                        "Level",
+                        Job::getLevel,
+                        ExportFormater.STRING
+                )
+        );
     }
 }
